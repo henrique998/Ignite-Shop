@@ -5,6 +5,10 @@ import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import Stripe from 'stripe'
+import { Header } from '../../components/Header'
+import { LoadingHeader } from '../../components/shimmer/LoadingHeader'
+import { LoadingProductInfo } from '../../components/shimmer/LoadingProductInfo'
+import { useShimmerEffect } from '../../contexts/ShimmerContext'
 import { stripe } from '../../lib/stripe'
 
 import {
@@ -24,8 +28,11 @@ interface ProductProps {
 }
 
 export default function Product({ product }: ProductProps) {
+  const { isLoading } = useShimmerEffect()
+
   const [isCreatingCheckoutSession, setIsCreatingCheckoutSession] =
     useState(false)
+
   const { isFallback } = useRouter()
 
   if (isFallback) {
@@ -50,11 +57,23 @@ export default function Product({ product }: ProductProps) {
     }
   }
 
+  if (isLoading) {
+    return (
+      <>
+        <LoadingHeader />
+
+        <LoadingProductInfo />
+      </>
+    )
+  }
+
   return (
     <>
       <Head>
         <title>{product.name} | Ignite Shop</title>
       </Head>
+
+      <Header />
 
       <ProductContainer>
         <ImageContainer>
@@ -71,7 +90,7 @@ export default function Product({ product }: ProductProps) {
             onClick={handleBuyProduct}
             disabled={isCreatingCheckoutSession}
           >
-            Comprar agora
+            Colocar na sacola
           </button>
         </ProductDetails>
       </ProductContainer>

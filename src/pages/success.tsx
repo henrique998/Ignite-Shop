@@ -3,8 +3,18 @@ import Image from 'next/future/image'
 import Head from 'next/head'
 import Link from 'next/link'
 import Stripe from 'stripe'
+import { useShimmerEffect } from '../contexts/ShimmerContext'
 import { stripe } from '../lib/stripe'
-import { ImageContainer, SuccessContainer } from '../styles/pages/success'
+
+import logo from '../assets/logo.svg'
+
+import {
+  ImagesContainer,
+  ImageWrapper,
+  LogoContainer,
+  SuccessContainer,
+} from '../styles/pages/success'
+import { LoadingSuccessInfo } from '../components/shimmer/LoadingSuccessInfo'
 
 interface SuccessProps {
   purchaseData: {
@@ -17,6 +27,12 @@ interface SuccessProps {
 }
 
 export default function Success({ purchaseData }: SuccessProps) {
+  const { isLoading } = useShimmerEffect()
+
+  if (isLoading) {
+    return <LoadingSuccessInfo />
+  }
+
   return (
     <>
       <Head>
@@ -25,22 +41,49 @@ export default function Success({ purchaseData }: SuccessProps) {
         <meta name="robots" content="noindex" />
       </Head>
 
+      <LogoContainer>
+        <Link href="/">
+          <a>
+            <Image src={logo} alt="" />
+          </a>
+        </Link>
+      </LogoContainer>
+
       <SuccessContainer>
+        <ImagesContainer>
+          <ImageWrapper>
+            <Image
+              src={purchaseData?.product.imageUrl}
+              alt=""
+              width={114}
+              height={106}
+            />
+          </ImageWrapper>
+
+          <ImageWrapper>
+            <Image
+              src={purchaseData?.product.imageUrl}
+              alt=""
+              width={114}
+              height={106}
+            />
+          </ImageWrapper>
+
+          <ImageWrapper>
+            <Image
+              src={purchaseData?.product.imageUrl}
+              alt=""
+              width={114}
+              height={106}
+            />
+          </ImageWrapper>
+        </ImagesContainer>
+
         <h1>Compra efetuada</h1>
 
-        <ImageContainer>
-          <Image
-            src={purchaseData?.product.imageUrl}
-            alt=""
-            width={114}
-            height={106}
-          />
-        </ImageContainer>
-
         <p>
-          Uhuul <strong>{purchaseData?.customerName}</strong>, sua{' '}
-          <strong>{purchaseData?.product.name}</strong> já está a caminho da sua
-          casa.{' '}
+          Uhuul <strong>{purchaseData?.customerName}</strong>, sua compra de 3
+          camisetas já está a caminho da sua casa.{' '}
         </p>
 
         <Link href="/">Voltar ao catálogo</Link>

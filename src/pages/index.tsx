@@ -1,18 +1,29 @@
 import Head from 'next/head'
 import { useKeenSlider } from 'keen-slider/react'
 
-import { HomeContainer, Product } from '../styles/pages/home'
+import {
+  HomeContainer,
+  Product,
+  BagButtonGreen,
+  ProductInfoContianer,
+  EyeButton,
+  NavControlLeft,
+  NavControlRight,
+} from '../styles/pages/home'
 
 import 'keen-slider/keen-slider.min.css'
 
 import { GetStaticProps } from 'next'
 import { stripe } from '../lib/stripe'
 import Stripe from 'stripe'
-import { useEffect, useState } from 'react'
 
 import Image from 'next/future/image'
-import Link from 'next/link'
 import { LoadingProduct } from '../components/shimmer/LoadingProduct'
+import { useShimmerEffect } from '../contexts/ShimmerContext'
+import { CaretRight, Eye, Handbag } from 'phosphor-react'
+import { Header } from '../components/Header'
+import { LoadingHeader } from '../components/shimmer/LoadingHeader'
+import { useState } from 'react'
 
 interface HomeProps {
   products: {
@@ -24,27 +35,36 @@ interface HomeProps {
 }
 
 export default function Home({ products }: HomeProps) {
-  const [isLoading, setIsLoading] = useState(true)
+  const { isLoading } = useShimmerEffect()
+  const [currentSlide, setCurrentSlide] = useState(0)
+  const [isSliderLoaded, setIsSliderLoaded] = useState(false)
 
-  useEffect(() => {
-    setTimeout(() => setIsLoading(false), 2000)
-  }, [])
-
-  const [sliderRef] = useKeenSlider({
+  const [sliderRef, instanceRef] = useKeenSlider<HTMLDivElement>({
+    initial: 0,
+    slideChanged(slider) {
+      setCurrentSlide(slider.track.details.rel)
+    },
     slides: {
       perView: 3,
       spacing: 48,
+    },
+    created() {
+      setIsSliderLoaded(true)
     },
   })
 
   if (isLoading) {
     return (
-      <HomeContainer className="shimmer">
-        <LoadingProduct />
-        <LoadingProduct />
-        <LoadingProduct />
-        <LoadingProduct />
-      </HomeContainer>
+      <>
+        <LoadingHeader />
+
+        <HomeContainer className="shimmer">
+          <LoadingProduct />
+          <LoadingProduct />
+          <LoadingProduct />
+          <LoadingProduct />
+        </HomeContainer>
+      </>
     )
   }
 
@@ -54,23 +74,68 @@ export default function Home({ products }: HomeProps) {
         <title>Home | Ignite Shop</title>
       </Head>
 
-      <HomeContainer ref={sliderRef} className="keen-slider">
-        {products?.map((product) => (
-          <Link
-            key={product.id}
-            href={`/product/${product.id}`}
-            prefetch={false}
-          >
-            <Product className="keen-slider__slide">
-              <Image src={product.imageUrl} alt="" width={520} height={480} />
+      <Header />
 
-              <footer>
+      <HomeContainer ref={sliderRef} className="keen-slider">
+        {isSliderLoaded && instanceRef.current && (
+          <NavControlLeft
+            className={
+              currentSlide === 0
+                ? 'slider-controll-invisible'
+                : 'slider-controll-visible'
+            }
+          >
+            <button
+              onClick={(e: any) =>
+                e.stopPropagation() || instanceRef.current?.prev()
+              }
+            >
+              <CaretRight size={48} color="#e1e1e6" />
+            </button>
+          </NavControlLeft>
+        )}
+
+        {products?.map((product) => (
+          <Product className="keen-slider__slide" key={product.id}>
+            <Image src={product.imageUrl} alt="" width={520} height={480} />
+
+            <EyeButton href={`/product/${product.id}`} prefetch={false}>
+              <a>
+                <Eye size={24} color="#fff" />
+              </a>
+            </EyeButton>
+
+            <ProductInfoContianer>
+              <div>
                 <strong>{product.name}</strong>
                 <span>{product.price}</span>
-              </footer>
-            </Product>
-          </Link>
+              </div>
+
+              <BagButtonGreen>
+                <Handbag size={24} color="#fff" />
+              </BagButtonGreen>
+            </ProductInfoContianer>
+          </Product>
         ))}
+
+        {isSliderLoaded && instanceRef.current && (
+          <NavControlRight
+            className={
+              currentSlide > 0 &&
+              currentSlide < instanceRef.current.track.details.slides.length - 1
+                ? 'slider-controll-invisible'
+                : 'slider-controll-visible'
+            }
+          >
+            <button
+              onClick={(e: any) =>
+                e.stopPropagation() || instanceRef.current?.next()
+              }
+            >
+              <CaretRight size={48} color="#e1e1e6" />
+            </button>
+          </NavControlRight>
+        )}
       </HomeContainer>
     </>
   )
