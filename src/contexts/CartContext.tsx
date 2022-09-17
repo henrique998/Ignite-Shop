@@ -1,4 +1,5 @@
 import produce from 'immer'
+import { parseCookies, setCookie } from 'nookies'
 import { createContext, ReactNode, useContext, useState } from 'react'
 
 export type Product = {
@@ -24,7 +25,15 @@ interface CartContextProviderProps {
 export const CartContext = createContext({} as CartContextData)
 
 export function CartContextProvider({ children }: CartContextProviderProps) {
-  const [products, setProducts] = useState<Product[]>([])
+  const [products, setProducts] = useState<Product[]>(() => {
+    const { '@ignite-shop:cart': storagedProducts } = parseCookies()
+
+    if (storagedProducts) {
+      return JSON.parse(storagedProducts)
+    }
+
+    return []
+  })
 
   const productsQuantity = products.length
 
@@ -41,6 +50,8 @@ export function CartContextProvider({ children }: CartContextProviderProps) {
       }
     })
 
+    setCookie(null, '@ignite-shop:cart', JSON.stringify(productCart))
+
     setProducts(productCart)
   }
 
@@ -56,6 +67,8 @@ export function CartContextProvider({ children }: CartContextProviderProps) {
     })
 
     setProducts(filteredProducts)
+
+    setCookie(null, '@ignite-shop:cart', JSON.stringify(filteredProducts))
   }
 
   return (

@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { destroyCookie } from 'nookies'
 import { X } from 'phosphor-react'
 import { useCart } from '../../contexts/CartContext'
 
@@ -35,6 +36,8 @@ export function Sidebar() {
       const response = await axios.post('/api/checkout', {
         pricesIdsWithQtd,
       })
+
+      destroyCookie(undefined, '@ignite-shop:cart')
 
       const { checkoutUrl } = response.data
 
