@@ -3,12 +3,17 @@ import { styled } from '../../styles'
 export const ProductItemContainer = styled('li', {
   display: 'flex',
   gap: '1.25rem',
+})
 
-  'div.image-container': {
-    width: '6.375rem',
-    height: '5.8125rem',
-    background: 'linear-gradient(180deg, #1EA483 0%, #7465D4 100%)',
-    borderRadius: 8,
+export const ProductImageContainer = styled('div', {
+  width: '6.375rem',
+  height: '5.8125rem',
+  background: 'linear-gradient(180deg, #1EA483 0%, #7465D4 100%)',
+  borderRadius: 8,
+
+  img: {
+    width: '100%',
+    height: '100%',
   },
 })
 

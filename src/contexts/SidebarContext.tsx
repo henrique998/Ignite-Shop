@@ -2,8 +2,10 @@ import { createContext, ReactNode, useContext, useState } from 'react'
 
 type SidebarContextData = {
   isSidebarOpen: boolean
+  isCreatingCheckoutSession: boolean
   handleOpenSidebar: () => void
   handleCloseSidebar: () => void
+  defineIsCreatingCheckoutSession: (state: boolean) => void
 }
 
 interface SidebarContextProviderProps {
@@ -17,6 +19,13 @@ export function SidebarContextProvider({
 }: SidebarContextProviderProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
+  const [isCreatingCheckoutSession, setIsCreatingCheckoutSession] =
+    useState(false)
+
+  function defineIsCreatingCheckoutSession(state: boolean) {
+    setIsCreatingCheckoutSession(state)
+  }
+
   function handleOpenSidebar() {
     setIsSidebarOpen(true)
   }
@@ -27,7 +36,13 @@ export function SidebarContextProvider({
 
   return (
     <SidebarContext.Provider
-      value={{ isSidebarOpen, handleOpenSidebar, handleCloseSidebar }}
+      value={{
+        isSidebarOpen,
+        isCreatingCheckoutSession,
+        handleOpenSidebar,
+        handleCloseSidebar,
+        defineIsCreatingCheckoutSession,
+      }}
     >
       {children}
     </SidebarContext.Provider>

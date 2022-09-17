@@ -1,5 +1,6 @@
 import { AppProps } from 'next/app'
 import { Sidebar } from '../components/Sidebar'
+import { CartContextProvider } from '../contexts/CartContext'
 import { ShimmerContextProvider } from '../contexts/ShimmerContext'
 import { SidebarContextProvider } from '../contexts/SidebarContext'
 
@@ -10,11 +11,13 @@ globalStyles()
 export default function App({ Component, pageProps }: AppProps) {
   return (
     <ShimmerContextProvider>
-      <SidebarContextProvider>
-        <Sidebar />
+      <CartContextProvider>
+        <SidebarContextProvider>
+          <Sidebar />
 
-        <Component {...pageProps} />
-      </SidebarContextProvider>
+          <Component {...pageProps} />
+        </SidebarContextProvider>
+      </CartContextProvider>
     </ShimmerContextProvider>
   )
 }

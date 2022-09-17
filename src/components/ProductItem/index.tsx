@@ -1,20 +1,38 @@
 import Image from 'next/future/image'
 
-import shirt from '../../assets/shirt.png'
-import { ProductInfo, ProductItemContainer } from './styles'
+import { Product, useCart } from '../../contexts/CartContext'
+import { formatPrice } from '../../utils/formatPrice'
+import {
+  ProductInfo,
+  ProductItemContainer,
+  ProductImageContainer,
+} from './styles'
 
-export function ProductItem() {
+interface ProductItemProps {
+  product: Product
+}
+
+export function ProductItem({ product }: ProductItemProps) {
+  const { removeproduct } = useCart()
+
   return (
     <ProductItemContainer>
-      <div className="image-container">
-        <Image src={shirt} alt="shirt" />
-      </div>
+      <ProductImageContainer>
+        <Image
+          src={product.imageUrl}
+          alt={product.name}
+          width={306}
+          height={93}
+        />
+      </ProductImageContainer>
 
       <ProductInfo>
-        <span>Camiseta Explorer</span>
-        <strong>R$ 79,90</strong>
+        <span>{product.name}</span>
+        <strong>{formatPrice(product.price)}</strong>
 
-        <button type={'button'}>REMOVER</button>
+        <button type={'button'} onClick={() => removeproduct(product.id)}>
+          REMOVER
+        </button>
       </ProductInfo>
     </ProductItemContainer>
   )

@@ -6,9 +6,11 @@ import logo from '../../assets/logo.svg'
 import { Handbag } from 'phosphor-react'
 import Link from 'next/link'
 import { useSidebar } from '../../contexts/SidebarContext'
+import { useCart } from '../../contexts/CartContext'
 
 export function Header() {
   const { handleOpenSidebar } = useSidebar()
+  const { productsQuantity } = useCart()
 
   return (
     <HeaderContainer>
@@ -21,7 +23,9 @@ export function Header() {
       <BagButton onClick={handleOpenSidebar}>
         <Handbag size={24} color="#e1e1e6" />
 
-        <ItemsCountBox>1</ItemsCountBox>
+        {productsQuantity > 0 && (
+          <ItemsCountBox>{productsQuantity}</ItemsCountBox>
+        )}
       </BagButton>
     </HeaderContainer>
   )

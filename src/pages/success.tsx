@@ -19,10 +19,10 @@ import { LoadingSuccessInfo } from '../components/shimmer/LoadingSuccessInfo'
 interface SuccessProps {
   purchaseData: {
     customerName: string
-    product: {
+    products: {
       name: string
       imageUrl: string
-    }
+    }[]
   }
 }
 
@@ -51,39 +51,26 @@ export default function Success({ purchaseData }: SuccessProps) {
 
       <SuccessContainer>
         <ImagesContainer>
-          <ImageWrapper>
-            <Image
-              src={purchaseData?.product.imageUrl}
-              alt=""
-              width={114}
-              height={106}
-            />
-          </ImageWrapper>
-
-          <ImageWrapper>
-            <Image
-              src={purchaseData?.product.imageUrl}
-              alt=""
-              width={114}
-              height={106}
-            />
-          </ImageWrapper>
-
-          <ImageWrapper>
-            <Image
-              src={purchaseData?.product.imageUrl}
-              alt=""
-              width={114}
-              height={106}
-            />
-          </ImageWrapper>
+          {purchaseData.products?.map((product) => (
+            <ImageWrapper key={product.name}>
+              <Image
+                src={product.imageUrl}
+                alt={product.name}
+                width={114}
+                height={106}
+              />
+            </ImageWrapper>
+          ))}
         </ImagesContainer>
 
         <h1>Compra efetuada</h1>
 
         <p>
-          Uhuul <strong>{purchaseData?.customerName}</strong>, sua compra de 3
-          camisetas já está a caminho da sua casa.{' '}
+          Uhuul <strong>{purchaseData?.customerName}</strong>, sua compra de{' '}
+          {purchaseData.products?.length > 1
+            ? `${purchaseData.products?.length} camisetas`
+            : `1 camiseta`}{' '}
+          já está a caminho da sua casa.{' '}
         </p>
 
         <Link href="/">Voltar ao catálogo</Link>
@@ -108,14 +95,18 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
     expand: ['line_items', 'line_items.data.price.product'],
   })
 
-  const productData = session.line_items.data[0].price.product as Stripe.Product
+  const productsData = session.line_items.data.map(
+    (item) => item.price.product as Stripe.Product,
+  )
 
   const purchaseData = {
     customerName: session.customer_details.name,
-    product: {
-      name: productData.name,
-      imageUrl: productData.images[0],
-    },
+    products: productsData.map((product) => {
+      return {
+        name: product.name,
+        imageUrl: product.images[0],
+      }
+    }),
   }
 
   return {

@@ -1,5 +1,22 @@
+import { useState } from 'react'
+import { GetStaticProps } from 'next'
+import Image from 'next/future/image'
 import Head from 'next/head'
+import Stripe from 'stripe'
 import { useKeenSlider } from 'keen-slider/react'
+
+import 'keen-slider/keen-slider.min.css'
+
+import { stripe } from '../lib/stripe'
+import { formatPrice } from '../utils/formatPrice'
+
+import { LoadingProduct } from '../components/shimmer/LoadingProduct'
+import { CaretRight, Eye, Handbag } from 'phosphor-react'
+import { Header } from '../components/Header'
+import { LoadingHeader } from '../components/shimmer/LoadingHeader'
+
+import { useShimmerEffect } from '../contexts/ShimmerContext'
+import { useCart } from '../contexts/CartContext'
 
 import {
   HomeContainer,
@@ -11,31 +28,20 @@ import {
   NavControlRight,
 } from '../styles/pages/home'
 
-import 'keen-slider/keen-slider.min.css'
-
-import { GetStaticProps } from 'next'
-import { stripe } from '../lib/stripe'
-import Stripe from 'stripe'
-
-import Image from 'next/future/image'
-import { LoadingProduct } from '../components/shimmer/LoadingProduct'
-import { useShimmerEffect } from '../contexts/ShimmerContext'
-import { CaretRight, Eye, Handbag } from 'phosphor-react'
-import { Header } from '../components/Header'
-import { LoadingHeader } from '../components/shimmer/LoadingHeader'
-import { useState } from 'react'
-
 interface HomeProps {
   products: {
     id: string
     name: string
     imageUrl: string
     price: number
+    defaultPriceId: string
   }[]
 }
 
 export default function Home({ products }: HomeProps) {
   const { isLoading } = useShimmerEffect()
+  const { addProductToCart } = useCart()
+
   const [currentSlide, setCurrentSlide] = useState(0)
   const [isSliderLoaded, setIsSliderLoaded] = useState(false)
 
@@ -108,10 +114,10 @@ export default function Home({ products }: HomeProps) {
             <ProductInfoContianer>
               <div>
                 <strong>{product.name}</strong>
-                <span>{product.price}</span>
+                <span>{formatPrice(product.price)}</span>
               </div>
 
-              <BagButtonGreen>
+              <BagButtonGreen onClick={() => addProductToCart(product)}>
                 <Handbag size={24} color="#fff" />
               </BagButtonGreen>
             </ProductInfoContianer>
@@ -153,10 +159,8 @@ export const getStaticProps: GetStaticProps = async () => {
       id: product.id,
       name: product.name,
       imageUrl: product.images[0],
-      price: new Intl.NumberFormat('pt-Br', {
-        style: 'currency',
-        currency: 'BRL',
-      }).format(price.unit_amount / 100),
+      price: price.unit_amount,
+      defaultPriceId: price.id,
     }
   })
 

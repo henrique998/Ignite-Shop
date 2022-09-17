@@ -21,7 +21,7 @@ export const HomeContainer = styled('main', {
   },
 
   '.slider-controll-invisible': {
-    opacity: 0,
+    display: 'none',
   },
 })
 
