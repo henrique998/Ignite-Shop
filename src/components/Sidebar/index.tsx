@@ -1,11 +1,14 @@
 import axios from 'axios'
 import { destroyCookie } from 'nookies'
 import { X } from 'phosphor-react'
-import { useCart } from '../../contexts/CartContext'
 
+import { ProductItem } from '../ProductItem'
+
+import { useCart } from '../../contexts/CartContext'
 import { useSidebar } from '../../contexts/SidebarContext'
 import { formatPrice } from '../../utils/formatPrice'
-import { ProductItem } from '../ProductItem'
+
+import emptyBagIcon from '../../assets/bag.svg'
 
 import {
   SidebarContainer,
@@ -13,11 +16,14 @@ import {
   ProductsList,
   CheckoutInfoContainer,
   CheckoutButton,
+  EmptyBagContainer,
 } from './styles'
+import Image from 'next/future/image'
 
 export function Sidebar() {
   const { handleCloseSidebar, isSidebarOpen, defineIsCreatingCheckoutSession } =
     useSidebar()
+
   const { products, productsTotal, productsQuantity } = useCart()
 
   async function handleBuyProducts() {
@@ -26,9 +32,9 @@ export function Sidebar() {
 
       const productsInCart = products.map((product) => product.defaultPriceId)
 
-      const pricesIdsWithQtd = productsInCart.map((product) => {
+      const pricesIdsWithQtd = productsInCart.map((priceId) => {
         return {
-          price: product,
+          price: priceId,
           quantity: 1,
         }
       })
@@ -69,11 +75,24 @@ export function Sidebar() {
 
           <h2>Sacola de compras</h2>
 
-          <ProductsList>
-            {products.map((product) => (
-              <ProductItem key={product.id} product={product} />
-            ))}
-          </ProductsList>
+          {productsQuantity > 0 ? (
+            <ProductsList>
+              {products.map((product) => (
+                <ProductItem key={product.id} product={product} />
+              ))}
+            </ProductsList>
+          ) : (
+            <EmptyBagContainer>
+              <Image
+                src={emptyBagIcon}
+                alt="empty bag"
+                width={210}
+                height={210}
+              />
+
+              <h3>Você ainda não adicionou nenhum produto a sacola</h3>
+            </EmptyBagContainer>
+          )}
 
           <CheckoutInfoContainer>
             <div>
@@ -91,7 +110,10 @@ export function Sidebar() {
             </div>
           </CheckoutInfoContainer>
 
-          <CheckoutButton onClick={handleBuyProducts}>
+          <CheckoutButton
+            onClick={handleBuyProducts}
+            disabled={productsQuantity === 0}
+          >
             Finalizar compra
           </CheckoutButton>
         </>

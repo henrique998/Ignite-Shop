@@ -79,8 +79,35 @@ export const CheckoutButton = styled('button', {
   fontSize: '1.125rem',
   fontWeight: 700,
 
-  '&:hover': {
+  '&:not(:disabled):hover': {
     backgroundColor: '$green300',
     transition: '0.2s',
+  },
+
+  '&:disabled': {
+    opacity: 0.6,
+    cursor: 'not-allowed',
+  },
+})
+
+export const EmptyBagContainer = styled('div', {
+  height: 'calc(100% - 21.125rem)',
+
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  justifyContent: 'center',
+
+  img: {
+    width: '4.375rem',
+    height: '4.375rem',
+  },
+
+  h3: {
+    marginTop: '1.5rem',
+    maxWidth: 310,
+    textAlign: 'center',
+    color: '$gray100',
+    fontWeight: 500,
   },
 })
